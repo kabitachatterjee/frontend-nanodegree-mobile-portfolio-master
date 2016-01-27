@@ -425,20 +425,20 @@ var resizePizzas = function(size) {
   function changePizzaSizes(size) {
     switch(size) {
         case "1":
-          newWidth = 25;
+          newWidth = 25; //asigning newWidth for size :"Small"
           break;
         case "2":
-          newWidth = 33.3;
+          newWidth = 33.3; //asigning newWidth for size:"Medium"
           break;
         case "3":
-          newWidth = 50;
+          newWidth = 50;//asigning newWidth for size:"Large"
           break;
         default:
           console.log("bug in changePizzaSizes");
       }
-    var randomPizzas = document.querySelectorAll(".randomPizzaContainer");
+    var randomPizzas = document.getElementsByClassName("randomPizzaContainer");// selecting all elements by the class .randomPizzaContainer
     for (var i = 0; i < randomPizzas.length; i++) {
-      randomPizzas[i].style.width = newWidth + "%";
+      randomPizzas[i].style.width = newWidth + "%"; // asigning each element of class randomPizzaContainer the newWidth
     }
   }
 
@@ -452,10 +452,9 @@ var resizePizzas = function(size) {
 };
 
 window.performance.mark("mark_start_generating"); // collect timing data
-
+var pizzasDiv = document.getElementById("randomPizzas");
 // This for-loop actually creates and appends all of the pizzas when the page loads
 for (var i = 2; i < 100; i++) {
-  var pizzasDiv = document.getElementById("randomPizzas");
   pizzasDiv.appendChild(pizzaElementGenerator(i));
 }
 
@@ -486,35 +485,15 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
-  var items = document.querySelectorAll('.mover');// selects the background pizza images using the .mover class
-  var scroll = (document.body.scrollTop / 1250); // measures the scrolling speed accross the page using scrollTop
-  var m = 100;
-  // Complex math calculations done outside the for loop
-  var phase0 = Math.sin(scroll + 0);
-  var phase1 = Math.sin(scroll + 1);
-  var phase2 = Math.sin(scroll + 2);
-  var phase3 = Math.sin(scroll + 3);
-  var phase4 = Math.sin(scroll + 4);
-  for (var i = 0; i < items.length; i++) {
-    var j = i%5;
-    if(j == 0){
-    items[i].style.left = items[i].basicLeft + m * phase0 + 'px';
-  }
-  if(j == 1){
-    items[i].style.left = items[i].basicLeft + m * phase1 + 'px';
-  }
-  if(j == 2){
-    items[i].style.left = items[i].basicLeft + m * phase2 + 'px';
-  }
-  if(j == 3){
-    items[i].style.left = items[i].basicLeft + m * phase3 + 'px';
-  }
-  if(j == 4){
-    items[i].style.left = items[i].basicLeft + m * phase4 + 'px';
-  }
+  var items = document.getElementsByClassName('mover');// selects the background pizza images using the .mover class
+  var phase = []; 
+for (var i = 0; i < 5; i++) {
+    phase.push(Math.sin(document.body.scrollTop / 1250 + i) * 100);// pre-calculating the phase values using complex math in a separate loop
 }
-
-  // User Timing API to the rescue again. Seriously, it's worth learning.
+for (var i = 0, max = items.length; i < max; i++) {
+    items[i].style.left = items[i].basicLeft + phase[i%5] + 'px';// using the pre-calculated phase values
+}
+// User Timing API to the rescue again. Seriously, it's worth learning.
   // Super easy to create custom metrics.
   window.performance.mark("mark_end_frame");
   window.performance.measure("measure_frame_duration", "mark_start_frame", "mark_end_frame");
@@ -529,9 +508,12 @@ window.addEventListener('scroll', updatePositions);
 
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
+  
+  var intHeight = window.innerHeight/100; // screen height divided by height of a background pizza image
+  var intWidth = window.innerWidth/73.333; // screen width divided by width of a background pizza image
   var cols = 8;
   var s = 256;
-  for (var i = 0; i < 200; i++) {
+  for (var i = 0; i < (intHeight * intWidth) ; i++) { // (intHeight * intWidth) gives the number of background pizza images needed to fill the screen dynamically neede
     var elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";
